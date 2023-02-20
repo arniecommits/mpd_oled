@@ -113,6 +113,7 @@ public:
   int reset_gpio = 25;           // reset pin
   int spi_dc_gpio = OLED_SPI_DC; // SPI DC
   int spi_cs = OLED_SPI_CS0;     // SPI CS - 0: CS0, 1: CS1
+  int sp_only = 0;				// Bit to track if spectrum only when music is playing
   Player player;
 
   OledOpts() : ProgramOpts("mpd_oled", "0.02")
@@ -174,6 +175,7 @@ Options
   -D <gpio>  SPI DC GPIO number (default: 24)
   -S <num>   SPI CS number (default: 0)
   -p <plyr>  Player: mpd, moode, volumio, runeaudio (default: detected)
+  -T <01>    Show specturm display only
 Example :
 %s -o 6 use a %s OLED
 )",
@@ -355,6 +357,12 @@ void OledOpts::process_command_line(int argc, char **argv)
       break;
     }
 
+	case 'T':
+      print_status_or_exit(read_int(optarg, &sp_only), c);
+      if (sp_only < 0 || sp_only > 1)
+        error("This should be 0 or 1", c);
+      break;
+
     default:
       error("unknown command line error");
     }
@@ -449,6 +457,14 @@ void draw_clock(ArduiPi_OLED &display, const display_info &disp_info)
   draw_date(display, 32, 56, 1, disp_info.date_format);
 }
 
+void draw_spect_display_only(ArduiPi_OLED &display, const display_info &disp_info)
+{
+  const int H = 8; // character height
+  const int W = 6; // character width
+  draw_spectrum(display, 0, 0, 128, 64, disp_info.spect);
+  
+}
+
 void draw_spect_display(ArduiPi_OLED &display, const display_info &disp_info)
 {
   const int H = 8; // character height
@@ -478,12 +494,16 @@ void draw_spect_display(ArduiPi_OLED &display, const display_info &disp_info)
                     100 * disp_info.status.get_progress());
 }
 
-void draw_display(ArduiPi_OLED &display, const display_info &disp_info)
+void draw_display(ArduiPi_OLED &display, const display_info &disp_info,const OledOpts &opts)
 {
   mpd_state state = disp_info.status.get_state();
   if (state == MPD_STATE_UNKNOWN || state == MPD_STATE_STOP ||
       (state == MPD_STATE_PAUSE && disp_info.pause_screen == 's'))
     draw_clock(display, disp_info);
+  else if (opts.sp_only==1)
+  {
+	draw_spect_display_only(display,disp_info);
+  }		
   else
     draw_spect_display(display, disp_info);
 }
