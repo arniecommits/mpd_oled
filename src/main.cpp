@@ -617,7 +617,7 @@ int start_idle_loop(ArduiPi_OLED &display, const OledOpts &opts)
       display.clearDisplay();
       pthread_mutex_lock(&disp_info_lock);
       display.invertDisplay(get_invert(opts.invert));
-      draw_display(display, disp_info);
+      draw_display(display, disp_info,opts);
       pthread_mutex_unlock(&disp_info_lock);
       display.display();
     }
