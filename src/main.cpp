@@ -462,6 +462,8 @@ void draw_spect_display_only(ArduiPi_OLED &display, const display_info &disp_inf
   const int H = 8; // character height
   const int W = 6; // character width
   draw_spectrum(display, 0, 0, 128, 64, disp_info.spect);
+  if (disp_info.status.get_kbitrate() > 0)
+    draw_text(display, 128 - 10 * W, 0, 4, disp_info.status.get_kbitrate_str());
   
 }
 
