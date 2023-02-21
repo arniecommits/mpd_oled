@@ -191,7 +191,7 @@ void OledOpts::process_command_line(int argc, char **argv)
 
   handle_long_opts(argc, argv);
 
-  while ((c = getopt(argc, argv, ":ho:b:g:f:s:C:dP:kc:RI:a:B:r:D:S:p:")) !=
+  while ((c = getopt(argc, argv, ":ho:b:g:f:s:C:dP:kc:RI:a:B:r:D:S:p:T:")) !=
          -1) {
     if (common_opts(c, optopt))
       continue;
